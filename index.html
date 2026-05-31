@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PersonaCare AI — FMCG Brand Intelligence Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0d0e10;
+  --ink2:#181a1e;
+  --ink3:#21242b;
+  --ink4:#2d3139;
+  --ink5:#3d424e;
+  --bone:#f5f0e8;
+  --bone2:#ede8df;
+  --bone3:#ddd8ce;
+  --sage:#2d6a4f;
+  --sage2:#40916c;
+  --sage3:#74c69d;
+  --sage-dim:#0d1f17;
+  --coral:#e76f51;
+  --coral-dim:#2a1409;
+  --gold:#d4a843;
+  --gold-dim:#2a2108;
+  --sky:#457b9d;
+  --sky-dim:#0d1e28;
+  --text:#f0ece4;
+  --text2:#9ba3b0;
+  --text3:#5a6170;
+  --border:#2a2e36;
+  --border2:#3a3f4a;
+  --radius:10px;
+  --radius-lg:16px;
+  --radius-xl:24px;
+}
+html,body{height:100%;background:var(--ink);color:var(--text);font-family:'DM Sans',sans-serif;overflow:hidden}
+
+/* LAYOUT */
+#shell{display:flex;height:100vh;overflow:hidden}
+
+/* SIDEBAR */
+#sidebar{
+  width:230px;flex-shrink:0;background:var(--ink2);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;overflow-y:auto;
+  padding:0 0 16px 0;
+}
+.sb-top{padding:22px 18px 18px;border-bottom:1px solid var(--border)}
+.sb-wordmark{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;letter-spacing:-0.02em;line-height:1}
+.sb-wordmark span{color:var(--sage3)}
+.sb-tagline{font-size:10px;color:var(--text3);margin-top:5px;letter-spacing:0.06em;text-transform:uppercase}
+.sb-section{padding:20px 0 4px}
+.sb-label{font-size:10px;font-weight:500;color:var(--text3);padding:0 18px 8px;text-transform:uppercase;letter-spacing:0.08em}
+.sb-item{
+  display:flex;align-items:center;gap:10px;padding:8px 18px;
+  font-size:13px;color:var(--text2);cursor:pointer;border:none;background:none;
+  width:100%;text-align:left;transition:all 0.15s;border-left:2px solid transparent;
+  font-family:'DM Sans',sans-serif;
+}
+.sb-item:hover{color:var(--text);background:var(--ink3)}
+.sb-item.active{color:var(--sage3);background:var(--sage-dim);border-left-color:var(--sage3);font-weight:500}
+.sb-item svg{width:15px;height:15px;flex-shrink:0;opacity:0.6}
+.sb-item.active svg{opacity:1}
+.sb-divider{border:none;border-top:1px solid var(--border);margin:8px 0}
+
+.brand-selector{padding:12px 18px}
+.brand-selector-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px}
+.brand-btn{
+  display:flex;align-items:center;gap:8px;padding:9px 12px;
+  border:1px solid var(--border);border-radius:var(--radius);
+  background:var(--ink3);cursor:pointer;margin-bottom:6px;width:100%;text-align:left;
+  transition:all 0.15s;font-family:'DM Sans',sans-serif;
+}
+.brand-btn:hover{border-color:var(--border2);background:var(--ink4)}
+.brand-btn.active{border-color:var(--sage2);background:var(--sage-dim)}
+.brand-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.brand-name{font-size:12px;font-weight:500;color:var(--text)}
+.brand-cat{font-size:10px;color:var(--text3)}
+
+.sb-footer{margin-top:auto;padding:14px 18px;border-top:1px solid var(--border)}
+.sb-footer-by{font-size:10px;color:var(--text3);line-height:1.6}
+.sb-footer-by strong{color:var(--sage3)}
+
+/* MAIN */
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+
+/* TOPBAR */
+#topbar{
+  height:58px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 24px;gap:16px;flex-shrink:0;
+  background:var(--ink2);
+}
+.tb-brand-indicator{
+  display:flex;align-items:center;gap:10px;padding:6px 14px;
+  background:var(--ink3);border:1px solid var(--border);border-radius:var(--radius);
+}
+.tb-brand-name{font-size:13px;font-weight:500;color:var(--text);font-family:'Syne',sans-serif}
+.tb-brand-cat{font-size:11px;color:var(--text3)}
+.tb-spacer{flex:1}
+.tb-chip{
+  display:flex;align-items:center;gap:6px;padding:5px 12px;
+  border:1px solid var(--border);border-radius:20px;
+  font-size:11px;color:var(--text3);background:var(--ink3);
+}
+.tb-chip-dot{width:6px;height:6px;border-radius:50%;background:var(--sage3);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.tb-date{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace}
+
+/* CONTENT */
+#content{flex:1;overflow-y:auto;padding:24px}
+
+/* PAGES */
+.page{display:none;animation:fadeUp 0.25s ease}
+.page.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* SECTION HEADER */
+.sec-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:20px}
+.sec-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;color:var(--text);letter-spacing:-0.02em}
+.sec-sub{font-size:13px;color:var(--text3);margin-top:3px}
+.sec-badge{
+  font-size:10px;font-weight:500;color:var(--sage3);
+  background:var(--sage-dim);border:1px solid var(--sage2);
+  padding:4px 10px;border-radius:10px;letter-spacing:0.04em;
+}
+
+/* KPI STRIP */
+.kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.kpi{
+  background:var(--ink2);border:1px solid var(--border);border-radius:var(--radius-lg);
+  padding:18px 20px;position:relative;overflow:hidden;cursor:default;
+  transition:border-color 0.2s;
+}
+.kpi:hover{border-color:var(--border2)}
+.kpi::before{
+  content:'';position:absolute;top:0;right:0;width:60px;height:60px;
+  border-radius:0 var(--radius-lg) 0 60px;opacity:0.06;
+}
+.kpi.sage::before{background:var(--sage3)}
+.kpi.coral::before{background:var(--coral)}
+.kpi.gold::before{background:var(--gold)}
+.kpi.sky::before{background:var(--sky)}
+.kpi-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:10px}
+.kpi-val{font-size:28px;font-weight:700;font-family:'Syne',sans-serif;letter-spacing:-0.02em;line-height:1}
+.kpi-val.sage{color:var(--sage3)}
+.kpi-val.coral{color:var(--coral)}
+.kpi-val.gold{color:var(--gold)}
+.kpi-val.sky{color:var(--sky)}
+.kpi-delta{display:inline-flex;align-items:center;gap:4px;font-size:11px;margin-top:6px;padding:2px 7px;border-radius:10px}
+.kpi-delta.up{background:var(--sage-dim);color:var(--sage3)}
+.kpi-delta.down{background:var(--coral-dim);color:var(--coral)}
+.kpi-sub{font-size:11px;color:var(--text3);margin-top:4px}
+
+/* GRID LAYOUTS */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px}
+.grid-6040{display:grid;grid-template-columns:1.5fr 1fr;gap:16px;margin-bottom:16px}
+.grid-4060{display:grid;grid-template-columns:1fr 1.5fr;gap:16px;margin-bottom:16px}
+
+/* PANELS */
+.panel{
+  background:var(--ink2);border:1px solid var(--border);border-radius:var(--radius-lg);
+  overflow:hidden;
+}
+.panel-header{
+  padding:14px 18px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.panel-title{font-size:12px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:0.07em}
+.panel-meta{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace}
+.panel-body{padding:18px}
+
+/* BAR CHARTS */
+.bar-chart{display:flex;flex-direction:column;gap:10px}
+.bar-row{display:flex;align-items:center;gap:10px}
+.bar-label{font-size:12px;color:var(--text2);width:100px;flex-shrink:0;text-align:right}
+.bar-track{flex:1;height:8px;background:var(--ink4);border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;transition:width 0.8s cubic-bezier(0.4,0,0.2,1)}
+.bar-pct{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;width:36px;text-align:right}
+
+/* DONUT CHART */
+.donut-wrap{display:flex;align-items:center;gap:20px}
+.donut-svg{flex-shrink:0}
+.donut-legend{display:flex;flex-direction:column;gap:8px}
+.legend-item{display:flex;align-items:center;gap:8px}
+.legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.legend-label{font-size:12px;color:var(--text2)}
+.legend-pct{font-size:12px;color:var(--text3);font-family:'DM Mono',monospace;margin-left:auto}
+
+/* SEGMENT CARDS */
+.segment-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.seg-card{
+  background:var(--ink3);border:1px solid var(--border);border-radius:var(--radius);
+  padding:14px;cursor:pointer;transition:all 0.15s;
+}
+.seg-card:hover{border-color:var(--border2);background:var(--ink4)}
+.seg-card.active{border-color:var(--sage2);background:var(--sage-dim)}
+.seg-name{font-size:13px;font-weight:500;color:var(--text);margin-bottom:4px;font-family:'Syne',sans-serif}
+.seg-size{font-size:11px;color:var(--text3);margin-bottom:8px}
+.seg-bar{height:4px;background:var(--ink5);border-radius:2px;margin-bottom:8px}
+.seg-bar-fill{height:100%;border-radius:2px}
+.seg-tags{display:flex;flex-wrap:wrap;gap:4px}
+.seg-tag{font-size:10px;padding:2px 7px;border-radius:10px;background:var(--ink5);color:var(--text3)}
+
+/* TREND LINE */
+.trend-line-wrap{position:relative;height:120px}
+
+/* INSIGHT CARDS */
+.insight-row{display:flex;flex-direction:column;gap:8px}
+.insight-card{
+  display:flex;align-items:flex-start;gap:12px;
+  background:var(--ink3);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;
+}
+.insight-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.insight-text{font-size:12px;color:var(--text2);line-height:1.55}
+.insight-text strong{color:var(--text);font-weight:500}
+
+/* AI RECO */
+.reco-card{
+  background:linear-gradient(135deg,var(--sage-dim),var(--ink3));
+  border:1px solid var(--sage2);border-radius:var(--radius-lg);padding:18px;margin-bottom:10px;
+}
+.reco-label{font-size:10px;color:var(--sage3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px}
+.reco-title{font-size:14px;font-weight:500;color:var(--text);margin-bottom:6px;font-family:'Syne',sans-serif}
+.reco-desc{font-size:12px;color:var(--text2);line-height:1.6}
+.reco-impact{display:inline-flex;align-items:center;gap:6px;margin-top:10px;font-size:11px;color:var(--sage3);background:var(--sage-dim);padding:3px 10px;border-radius:10px;border:1px solid var(--sage2)}
+
+/* FORECAST TABLE */
+.forecast-table{width:100%;border-collapse:collapse}
+.forecast-table th{text-align:left;padding:8px 10px;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;border-bottom:1px solid var(--border);font-weight:500}
+.forecast-table td{padding:10px 10px;font-size:12px;color:var(--text2);border-bottom:1px solid var(--border)}
+.forecast-table tr:last-child td{border-bottom:none}
+.forecast-table td:first-child{color:var(--text);font-weight:500}
+.forecast-table td.pos{color:var(--sage3)}
+.forecast-table td.neg{color:var(--coral)}
+.forecast-table td.mono{font-family:'DM Mono',monospace;font-size:11px}
+
+/* COMPETITOR MAP */
+.comp-map{position:relative;background:var(--ink3);border-radius:var(--radius);overflow:hidden}
+.comp-axis-h{position:absolute;bottom:50%;left:0;right:0;border-top:1px dashed var(--border2)}
+.comp-axis-v{position:absolute;left:50%;top:0;bottom:0;border-left:1px dashed var(--border2)}
+.comp-label-tl{position:absolute;top:8px;left:10px;font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em}
+.comp-label-tr{position:absolute;top:8px;right:10px;font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em}
+.comp-label-bl{position:absolute;bottom:8px;left:10px;font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em}
+.comp-label-br{position:absolute;bottom:8px;right:10px;font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em}
+.comp-bubble{position:absolute;border-radius:50%;display:flex;align-items:center;justify-content:center;transform:translate(-50%,-50%);cursor:pointer;transition:all 0.2s;border:2px solid transparent}
+.comp-bubble:hover{transform:translate(-50%,-50%) scale(1.08)}
+.comp-bubble-label{font-size:9px;font-weight:600;color:#fff;text-align:center;font-family:'Syne',sans-serif;line-height:1.2}
+.axis-label-x{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);font-size:9px;color:var(--text3);letter-spacing:0.05em;text-transform:uppercase}
+.axis-label-y{position:absolute;left:6px;top:50%;transform:translateY(-50%) rotate(-90deg);font-size:9px;color:var(--text3);letter-spacing:0.05em;text-transform:uppercase;white-space:nowrap}
+
+/* HEAT MAP */
+.heat-grid{display:grid;grid-template-columns:80px repeat(5,1fr);gap:4px;font-size:11px}
+.heat-col-label{text-align:center;padding:4px;color:var(--text3);font-size:10px}
+.heat-row-label{color:var(--text2);display:flex;align-items:center;font-size:11px}
+.heat-cell{height:36px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;font-family:'DM Mono',monospace;cursor:default;transition:transform 0.15s}
+.heat-cell:hover{transform:scale(1.05)}
+
+/* PROMO CALENDAR */
+.promo-months{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.promo-month{background:var(--ink3);border-radius:var(--radius);padding:10px;border:1px solid var(--border)}
+.promo-month-name{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;text-align:center}
+.promo-intensity{height:6px;border-radius:3px;margin-bottom:6px}
+.promo-tags{display:flex;flex-wrap:wrap;gap:3px;justify-content:center}
+.promo-tag{font-size:9px;padding:1px 5px;border-radius:6px;background:var(--ink5);color:var(--text3)}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--ink)}
+::-webkit-scrollbar-thumb{background:var(--ink4);border-radius:3px}
+
+/* TOOLTIP */
+.tooltip{position:absolute;background:var(--ink4);border:1px solid var(--border2);border-radius:var(--radius);padding:8px 12px;font-size:11px;color:var(--text);pointer-events:none;z-index:100;white-space:nowrap;display:none}
+
+/* ABOUT BANNER */
+.about-banner{
+  background:linear-gradient(135deg,var(--sage-dim) 0%,var(--ink3) 60%,var(--gold-dim) 100%);
+  border:1px solid var(--sage2);border-radius:var(--radius-xl);padding:28px 32px;margin-bottom:20px;
+}
+.about-banner-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--text);margin-bottom:8px}
+.about-banner-body{font-size:13px;color:var(--text2);line-height:1.7;max-width:680px}
+.about-banner-meta{display:flex;gap:16px;margin-top:16px;flex-wrap:wrap}
+.about-meta-pill{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);background:var(--ink2);border:1px solid var(--border);padding:5px 12px;border-radius:10px}
+
+/* WATERMARK / ATTRIBUTION */
+.attr-bar{background:var(--ink2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.attr-name{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--text)}
+.attr-desc{font-size:11px;color:var(--text3);margin-top:2px}
+.attr-tag{font-size:10px;color:var(--sage3);background:var(--sage-dim);border:1px solid var(--sage2);padding:3px 10px;border-radius:10px;letter-spacing:0.04em}
+</style>
+</head>
+<body>
+
+<div id="shell">
+
+<!-- SIDEBAR -->
+<nav id="sidebar">
+  <div class="sb-top">
+    <div class="sb-wordmark">Persona<span>Care</span> AI</div>
+    <div class="sb-tagline">FMCG Intelligence Platform</div>
+  </div>
+
+  <div class="sb-section">
+    <div class="sb-label">Navigation</div>
+    <button class="sb-item active" onclick="nav('overview',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Market Overview
+    </button>
+    <button class="sb-item" onclick="nav('segments',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/></svg>
+      Consumer Segments
+    </button>
+    <button class="sb-item" onclick="nav('forecast',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Demand Forecast
+    </button>
+    <button class="sb-item" onclick="nav('competitive',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+      Competitive Map
+    </button>
+    <button class="sb-item" onclick="nav('promo',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Promo Timing
+    </button>
+    <button class="sb-item" onclick="nav('recommendations',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+      AI Recommendations
+    </button>
+    <button class="sb-item" onclick="nav('about',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      About This Project
+    </button>
+  </div>
+
+  <hr class="sb-divider">
+
+  <div class="brand-selector">
+    <div class="brand-selector-label">Active Brand</div>
+    <button class="brand-btn active" onclick="setBrand('himalaya',this)">
+      <div class="brand-dot" style="background:#74c69d"></div>
+      <div><div class="brand-name">Himalaya</div><div class="brand-cat">Herbal Skincare</div></div>
+    </button>
+    <button class="brand-btn" onclick="setBrand('wow',this)">
+      <div class="brand-dot" style="background:#e76f51"></div>
+      <div><div class="brand-name">WOW Skin Science</div><div class="brand-cat">D2C Natural Care</div></div>
+    </button>
+    <button class="brand-btn" onclick="setBrand('ponds',this)">
+      <div class="brand-dot" style="background:#d4a843"></div>
+      <div><div class="brand-name">Pond's (HUL)</div><div class="brand-cat">Mass Skincare</div></div>
+    </button>
+    <button class="brand-btn" onclick="setBrand('mcaffeine',this)">
+      <div class="brand-dot" style="background:#457b9d"></div>
+      <div><div class="brand-name">mCaffeine</div><div class="brand-cat">Premium D2C</div></div>
+    </button>
+  </div>
+
+  <div class="sb-footer">
+    <div class="sb-footer-by">Built by <strong>Atul Raj Prasad</strong><br>PGDM Marketing · AI Strategy Project<br>Personal Care FMCG Intelligence</div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div id="main">
+  <div id="topbar">
+    <div class="tb-brand-indicator">
+      <div class="brand-dot" id="tb-dot" style="background:#74c69d"></div>
+      <div>
+        <div class="tb-brand-name" id="tb-brand">Himalaya</div>
+        <div class="tb-brand-cat" id="tb-cat">Herbal Skincare · India</div>
+      </div>
+    </div>
+    <div class="tb-spacer"></div>
+    <div class="tb-chip"><div class="tb-chip-dot"></div>AI Model Active</div>
+    <div class="tb-date" id="tb-date"></div>
+  </div>
+
+  <div id="content">
+
+    <!-- OVERVIEW -->
+    <div class="page active" id="page-overview">
+      <div class="sec-header">
+        <div><div class="sec-title" id="ov-title">Himalaya — Market Overview</div><div class="sec-sub">AI-generated brand intelligence · Personal Care India · FY2025–26</div></div>
+        <div class="sec-badge">Live Model</div>
+      </div>
+
+      <div class="kpi-strip">
+        <div class="kpi sage">
+          <div class="kpi-label">Est. Market Share</div>
+          <div class="kpi-val sage" id="kpi-share">18.4%</div>
+          <div class="kpi-delta up" id="kpi-share-d">↑ 1.2% YoY</div>
+        </div>
+        <div class="kpi coral">
+          <div class="kpi-label">Brand Loyalty Index</div>
+          <div class="kpi-val coral" id="kpi-loyalty">72</div>
+          <div class="kpi-delta up" id="kpi-loyalty-d">↑ 4 pts</div>
+          <div class="kpi-sub">out of 100</div>
+        </div>
+        <div class="kpi gold">
+          <div class="kpi-label">Avg. Repeat Purchase</div>
+          <div class="kpi-val gold" id="kpi-repeat">38 days</div>
+          <div class="kpi-delta up" id="kpi-repeat-d">↓ 3 days faster</div>
+        </div>
+        <div class="kpi sky">
+          <div class="kpi-label">Digital Reach Score</div>
+          <div class="kpi-val sky" id="kpi-digital">6.4 / 10</div>
+          <div class="kpi-delta down" id="kpi-digital-d">↓ 0.3 vs D2C avg</div>
+        </div>
+      </div>
+
+      <div class="grid-6040">
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-title">Revenue Channel Mix</span>
+            <span class="panel-meta" id="ch-label">Himalaya FY26</span>
+          </div>
+          <div class="panel-body">
+            <div class="bar-chart" id="channel-bars"></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-title">Consumer Age Distribution</span>
+            <span class="panel-meta" id="age-label">AI Modelled</span>
+          </div>
+          <div class="panel-body" style="display:flex;align-items:center;justify-content:center;min-height:160px">
+            <div class="donut-wrap">
+              <svg class="donut-svg" width="110" height="110" viewBox="0 0 110 110" id="donut-svg"></svg>
+              <div class="donut-legend" id="donut-legend"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-title">Purchase Driver Ranking</span>
+            <span class="panel-meta">AI Segmented</span>
+          </div>
+          <div class="panel-body">
+            <div class="bar-chart" id="driver-bars"></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-title">AI Insight Summary</span>
+            <span class="panel-meta" id="insight-label">3 signals detected</span>
+          </div>
+          <div class="panel-body">
+            <div class="insight-row" id="overview-insights"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEGMENTS -->
+    <div class="page" id="page-segments">
+      <div class="sec-header">
+        <div><div class="sec-title">Consumer Segmentation Engine</div><div class="sec-sub">AI-powered psychographic and behavioural clustering · Personal Care India</div></div>
+        <div class="sec-badge">4 Segments Active</div>
+      </div>
+      <div class="grid-6040" style="margin-bottom:16px">
+        <div>
+          <div style="margin-bottom:12px;font-size:11px;color:var(--text3)">Click a segment to explore its profile</div>
+          <div class="segment-grid" id="seg-grid"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">Segment Detail</span><span class="panel-meta" id="seg-detail-label">Select a segment</span></div>
+          <div class="panel-body" id="seg-detail-body">
+            <div style="color:var(--text3);font-size:13px;text-align:center;padding:30px 0">← Select a segment to view its profile</div>
+          </div>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">Segment Size Comparison</span><span class="panel-meta">% of total addressable consumers</span></div>
+          <div class="panel-body"><div class="bar-chart" id="seg-size-bars"></div></div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">AI vs Traditional Segmentation</span><span class="panel-meta">How AI changes the picture</span></div>
+          <div class="panel-body" id="seg-compare-body"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FORECAST -->
+    <div class="page" id="page-forecast">
+      <div class="sec-header">
+        <div><div class="sec-title">Demand Forecast Model</div><div class="sec-sub">AI-generated 12-month demand projections · Scenario planning for Personal Care</div></div>
+        <div class="sec-badge">3 Scenarios</div>
+      </div>
+      <div class="grid-3" style="margin-bottom:16px">
+        <div class="kpi sage" style="cursor:pointer" onclick="setScenario('base')">
+          <div class="kpi-label">Base Scenario</div>
+          <div class="kpi-val sage">+12.4%</div>
+          <div class="kpi-sub">Steady growth. No major shocks.</div>
+        </div>
+        <div class="kpi gold" style="cursor:pointer" onclick="setScenario('bull')">
+          <div class="kpi-label">Bull Scenario</div>
+          <div class="kpi-val gold">+21.8%</div>
+          <div class="kpi-sub">AI targeting + D2C push works.</div>
+        </div>
+        <div class="kpi coral" style="cursor:pointer" onclick="setScenario('bear')">
+          <div class="kpi-label">Bear Scenario</div>
+          <div class="kpi-val coral">+4.1%</div>
+          <div class="kpi-sub">Input cost pressure + weak demand.</div>
+        </div>
+      </div>
+      <div class="panel" style="margin-bottom:16px">
+        <div class="panel-header">
+          <span class="panel-title">12-Month Demand Forecast — <span id="scenario-label">Base Scenario</span></span>
+          <span class="panel-meta">Indexed to Q1 FY26 = 100</span>
+        </div>
+        <div class="panel-body">
+          <svg id="forecast-svg" width="100%" height="200" viewBox="0 0 800 200" preserveAspectRatio="none" style="display:block"></svg>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">Monthly Forecast Detail</span><span class="panel-meta" id="forecast-table-label">Base Scenario · Units indexed</span></div>
+        <div class="panel-body" style="padding:0">
+          <table class="forecast-table" id="forecast-table"></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- COMPETITIVE -->
+    <div class="page" id="page-competitive">
+      <div class="sec-header">
+        <div><div class="sec-title">Competitive Positioning Map</div><div class="sec-sub">AI-mapped perception vs pricing matrix · India Personal Care FY2026</div></div>
+        <div class="sec-badge">7 Brands Mapped</div>
+      </div>
+      <div class="grid-6040">
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">Perception vs Price Matrix</span><span class="panel-meta">Bubble size = est. market share</span></div>
+          <div class="panel-body" style="padding:8px">
+            <div class="comp-map" style="height:300px;padding:20px" id="comp-map">
+              <div class="comp-axis-h"></div>
+              <div class="comp-axis-v"></div>
+              <div class="comp-label-tl">Premium Perception</div>
+              <div class="comp-label-tr">Premium · Aspirational</div>
+              <div class="comp-label-bl">Mass · Value</div>
+              <div class="comp-label-br">Value Perception</div>
+              <div class="axis-label-x">Price Point →</div>
+              <div class="axis-label-y">Brand Perception</div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="panel" style="margin-bottom:12px">
+            <div class="panel-header"><span class="panel-title">Share of Voice</span><span class="panel-meta">Social + Digital · Est.</span></div>
+            <div class="panel-body"><div class="bar-chart" id="sov-bars"></div></div>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><span class="panel-title">Category Whitespace</span><span class="panel-meta">AI-identified gaps</span></div>
+            <div class="panel-body">
+              <div class="insight-row">
+                <div class="insight-card"><div class="insight-icon" style="background:#0d2a1a;font-size:16px">◎</div><div class="insight-text"><strong>Affordable Derma-Science</strong> — No brand strongly owns the "science-backed under ₹300" space.</div></div>
+                <div class="insight-card"><div class="insight-icon" style="background:#2a2108;font-size:16px">◎</div><div class="insight-text"><strong>Men's Tier-2 Skincare</strong> — D2C brands ignore Tier-2/3 men. Legacy brands don't personalise.</div></div>
+                <div class="insight-card"><div class="insight-icon" style="background:#0d1e28;font-size:16px">◎</div><div class="insight-text"><strong>Skin-Type Personalisation</strong> — Consumers demand routine customisation. No mass brand delivers it at scale.</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">Attribute Perception Heatmap</span><span class="panel-meta">Scored 1–10 by AI model · Consumer perception data</span></div>
+        <div class="panel-body" id="heatmap-body"></div>
+      </div>
+    </div>
+
+    <!-- PROMO -->
+    <div class="page" id="page-promo">
+      <div class="sec-header">
+        <div><div class="sec-title">AI Promotional Timing Engine</div><div class="sec-sub">When to push, when to pull — AI-optimised promotional calendar</div></div>
+        <div class="sec-badge">12-Month Plan</div>
+      </div>
+      <div class="panel" style="margin-bottom:16px">
+        <div class="panel-header"><span class="panel-title">Promotional Intensity Calendar</span><span class="panel-meta">Higher = more promotional pressure recommended</span></div>
+        <div class="panel-body">
+          <div class="promo-months" id="promo-cal"></div>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">Trigger Events — Personal Care India</span><span class="panel-meta">AI-identified demand spikes</span></div>
+          <div class="panel-body">
+            <div class="insight-row">
+              <div class="insight-card"><div class="insight-icon" style="background:#0d2a1a;font-size:14px">📅</div><div class="insight-text"><strong>Wedding Season (Oct–Feb):</strong> Skincare demand surges 34% above baseline. Bridal and grooming SKUs lead.</div></div>
+              <div class="insight-card"><div class="insight-icon" style="background:#2a2108;font-size:14px">📅</div><div class="insight-text"><strong>Summer (Mar–Jun):</strong> Sun protection, oil-control, and face wash demand peaks. Tier-2 cities drive volume.</div></div>
+              <div class="insight-card"><div class="insight-icon" style="background:#0d1e28;font-size:14px">📅</div><div class="insight-text"><strong>Festive Season (Sep–Nov):</strong> Gift sets and premium SKUs see 28% revenue uplift. D2C bundles outperform.</div></div>
+              <div class="insight-card"><div class="insight-icon" style="background:#2a1409;font-size:14px">📅</div><div class="insight-text"><strong>New Year (Jan):</strong> "New year, new skin" behaviour drives cleanser and serum trial purchases +19%.</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">Channel-Level Timing Strategy</span><span class="panel-meta">Where to spend at each phase</span></div>
+          <div class="panel-body">
+            <div class="insight-row">
+              <div class="insight-card"><div class="insight-icon" style="background:#0d2a1a;font-size:14px">📲</div><div class="insight-text"><strong>Instagram/Reels:</strong> Best ROI in pre-festive phase (Aug–Sep). Skincare tutorials + founder content outperform ads.</div></div>
+              <div class="insight-card"><div class="insight-icon" style="background:#0d1e28;font-size:14px">🛒</div><div class="insight-text"><strong>Quick Commerce (Zepto/Blinkit):</strong> Highest CTR on weekend mornings. Works best for replenishment SKUs.</div></div>
+              <div class="insight-card"><div class="insight-icon" style="background:#2a2108;font-size:14px">📧</div><div class="insight-text"><strong>Email/WhatsApp:</strong> Highest repeat-purchase activation in Jan–Mar. "Your skin needs this post-winter" messaging converts at 3.2x.</div></div>
+              <div class="insight-card"><div class="insight-icon" style="background:#2a1409;font-size:14px">🏪</div><div class="insight-text"><strong>GT / Kirana:</strong> In-store display investment most effective Apr–Jun. Impulse buying drives trial at ₹99–₹149 price point.</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RECOMMENDATIONS -->
+    <div class="page" id="page-recommendations">
+      <div class="sec-header">
+        <div><div class="sec-title">AI Strategic Recommendations</div><div class="sec-sub">Actionable growth priorities generated from segmentation, forecast, and competitive data</div></div>
+        <div class="sec-badge" id="reco-brand-label">Himalaya</div>
+      </div>
+      <div id="reco-list"></div>
+    </div>
+
+    <!-- ABOUT -->
+    <div class="page" id="page-about">
+      <div class="about-banner">
+        <div class="about-banner-title">PersonaCare AI — Project Documentation</div>
+        <div class="about-banner-body">
+          This dashboard simulates what an AI-powered Brand Intelligence system would look like for a Personal Care FMCG brand operating in India. It was built to demonstrate applied thinking at the intersection of <strong style="color:var(--sage3)">marketing strategy, consumer segmentation, and AI-driven analytics</strong> — not as a theoretical exercise, but as a working tool a brand manager or strategy analyst could actually use.
+        </div>
+        <div class="about-banner-meta">
+          <div class="about-meta-pill">📍 Domain: FMCG Personal Care — India</div>
+          <div class="about-meta-pill">🧠 Frameworks: RFM, Psychographic Clustering, BCG, AIDA</div>
+          <div class="about-meta-pill">📊 Output: Interactive Decision Tool</div>
+          <div class="about-meta-pill">🛠 Built with: HTML · CSS · JavaScript</div>
+        </div>
+      </div>
+
+      <div class="attr-bar">
+        <div>
+          <div class="attr-name">Atul Raj Prasad</div>
+          <div class="attr-desc">PGDM – Marketing Management | AI & Business Strategy</div>
+        </div>
+        <div class="attr-tag">AI + FMCG Strategy Project · 2025–26</div>
+      </div>
+
+      <div class="grid-2" style="margin-bottom:16px">
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">What This Dashboard Demonstrates</span></div>
+          <div class="panel-body">
+            <div class="insight-row">
+              <div class="insight-card"><div class="insight-icon" style="background:#0d2a1a;font-size:14px">◈</div><div class="insight-text"><strong>Consumer Segmentation:</strong> AI-modelled psychographic and behavioural clusters replacing traditional demographic-only segmentation.</div></div>
+              <div class="insight-card"><div class="insight-icon" style="background:#2a2108;font-size:14px">◈</div><div class="insight-text"><strong>Demand Forecasting:</strong> Scenario-based 12-month projections incorporating seasonal triggers and market shocks.</div></div>
+              <div class="insight-card"><div class="insight-icon" style="background:#0d1e28;font-size:14px">◈</div><div class="insight-text"><strong>Competitive Intelligence:</strong> Perception-price mapping and share-of-voice analysis to identify whitespace opportunities.</div></div>
+              <div class="insight-card"><div class="insight-icon" style="background:#2a1409;font-size:14px">◈</div><div class="insight-text"><strong>Promotional Optimisation:</strong> AI-recommended timing and channel strategy tied to real Indian market trigger events.</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">Analytical Frameworks Applied</span></div>
+          <div class="panel-body">
+            <div class="insight-row">
+              <div class="insight-card"><div class="insight-icon" style="background:#0d2a1a;font-size:14px">▸</div><div class="insight-text"><strong>RFM Analysis</strong> — Recency, Frequency, Monetary segmentation to identify high-value vs lapsed consumers.</div></div>
+              <div class="insight-card"><div class="insight-icon" style="background:#0d1e28;font-size:14px">▸</div><div class="insight-text"><strong>Perceptual Mapping</strong> — 2-axis positioning of brands on price vs. perceived quality for competitive gap analysis.</div></div>
+              <div class="insight-card"><div class="insight-icon" style="background:#2a2108;font-size:14px">▸</div><div class="insight-text"><strong>Psychographic Clustering</strong> — Moving beyond age/income to values, lifestyle, and digital behaviour as segmentation variables.</div></div>
+              <div class="insight-card"><div class="insight-icon" style="background:#2a1409;font-size:14px">▸</div><div class="insight-text"><strong>Promotional Response Modelling</strong> — Mapping channel spend to conversion probability by season and consumer segment.</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">Methodology & Data Approach</span></div>
+        <div class="panel-body">
+          <p style="font-size:13px;color:var(--text2);line-height:1.8;max-width:700px">The data in this dashboard is AI-simulated and grounded in <strong style="color:var(--text)">publicly available market intelligence</strong> from sources including Euromonitor, Nielsen India FMCG reports, Mintel Personal Care data, Kantar Brand Health studies, and industry publications. All brand figures represent estimated/modelled values for analytical purposes and do not represent proprietary data of any company. The purpose is to demonstrate the <strong style="color:var(--text)">analytical thinking, framework application, and decision-tool design</strong> that would accompany a real AI-integrated brand intelligence system.</p>
+          <div style="margin-top:16px;padding:12px 16px;background:var(--ink3);border:1px solid var(--border);border-radius:var(--radius);font-size:11px;color:var(--text3)">
+            <strong style="color:var(--text2)">Contact for collaboration or internship inquiries:</strong> atulprasad1557@gmail.com · linkedin.com/in/atulrajprasad
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end #content -->
+</div><!-- end #main -->
+</div><!-- end #shell -->
+
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+// ─── DATE ───────────────────────────────────────────────
+const now = new Date();
+document.getElementById('tb-date').textContent = now.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+
+// ─── BRAND DATA ─────────────────────────────────────────
+const BRANDS = {
+  himalaya: {
+    name:'Himalaya', cat:'Herbal Skincare · India', dot:'#74c69d',
+    kpi:{share:'18.4%', shareD:'↑ 1.2% YoY', loyalty:'72', loyaltyD:'↑ 4 pts', repeat:'38 days', repeatD:'↓ 3 days faster', digital:'6.4 / 10', digitalD:'↓ 0.3 vs D2C avg'},
+    channels:[{l:'General Trade',v:48},{l:'Modern Trade',v:22},{l:'E-commerce',v:18},{l:'Pharma / D2C',v:12}],
+    ages:[{l:'18–24',v:22,c:'#74c69d'},{l:'25–34',v:34,c:'#40916c'},{l:'35–44',v:26,c:'#2d6a4f'},{l:'45+',v:18,c:'#1b4332'}],
+    drivers:[{l:'Trust in brand',v:78},{l:'Natural ingredients',v:72},{l:'Affordability',v:65},{l:'Dermatologist rec.',v:48},{l:'Packaging appeal',v:35}],
+    insights:[
+      {icon:'🌿',bg:'#0d2a1a',text:'<strong>Herbal credibility</strong> is the #1 equity asset. 72% of loyalists cite "trusted since childhood" as their primary reason.'},
+      {icon:'📱',bg:'#2a2108',text:'<strong>Digital underperformance</strong>: brand search volume 3× lower than WOW. Digital ad recall at 31% vs category avg of 48%.'},
+      {icon:'🏘️',bg:'#0d1e28',text:'<strong>Tier-2/3 dominance</strong>: 61% of volume from non-metro markets. AI signals strong untapped premium upside in metro Millennials.'}
+    ],
+    recos:[
+      {label:'Priority 1 — Segmentation',title:'Launch AI-personalised skin quiz on D2C platform',desc:'AI segmentation identifies that 34% of Himalaya\'s Millennial consumers are "Informed Naturalists" — they research ingredients before buying. A personalised routine builder would increase D2C conversion by an estimated 2.4× based on WOW\'s comparable test.',impact:'Projected uplift: +18% D2C revenue in 6 months'},
+      {label:'Priority 2 — Pricing',title:'Introduce a ₹199–₹299 "science + herbal" bridge SKU range',desc:'Competitive whitespace analysis shows no brand owns affordable derma-science. Himalaya\'s herbal trust + a dermatologist-validated positioning would unlock the aspirational Tier-1 consumer who currently migrates to Minimalist or The Ordinary.',impact:'Addressable market: ~₹1,400 Cr annually'},
+      {label:'Priority 3 — Timing',title:'Shift festive spend from mass media to WhatsApp-first personalisation',desc:'AI promotional modelling shows that personalised WhatsApp outreach (product recommendation + replenishment reminder) converts at 3.2× vs generic festive ads for repeat purchase categories. Cost per acquisition drops 44%.',impact:'ROI improvement: 44% lower CPA vs TV/print'},
+      {label:'Priority 4 — Channel',title:'Build a Kirana-level loyalty micro-programme in Tier-2 cities',desc:'61% of Himalaya volume moves through General Trade, yet no loyalty mechanic exists at the kirana level. A QR-based retailer incentive programme (as tested by Marico) increased retailer push by 29% in comparable markets.',impact:'Est. volume uplift: +8% GT sales within 12 months'}
+    ]
+  },
+  wow: {
+    name:'WOW Skin Science', cat:'D2C Natural Care · India', dot:'#e76f51',
+    kpi:{share:'6.2%', shareD:'↑ 3.8% YoY', loyalty:'58', loyaltyD:'↑ 11 pts', repeat:'24 days', repeatD:'↓ 8 days faster', digital:'9.1 / 10', digitalD:'↑ 1.4 vs trad. avg'},
+    channels:[{l:'Amazon / Flipkart',v:52},{l:'Own D2C',v:26},{l:'Modern Trade',v:14},{l:'General Trade',v:8}],
+    ages:[{l:'18–24',v:38,c:'#e76f51'},{l:'25–34',v:42,c:'#c4542a'},{l:'35–44',v:14,c:'#8c3115'},{l:'45+',v:6,c:'#5a1e0a'}],
+    drivers:[{l:'Social proof/reviews',v:82},{l:'Natural ingredients',v:74},{l:'Influencer trust',v:68},{l:'Price-value',v:62},{l:'Packaging design',v:55}],
+    insights:[
+      {icon:'📱',bg:'#2a1409',text:'<strong>Social-first model</strong>: 43% of new customers discover WOW through Reels or YouTube. Highest digital recall in category at 61%.'},
+      {icon:'⭐',bg:'#0d2a1a',text:'<strong>Review-driven conversion</strong>: Amazon page has 200K+ reviews. AI signals review sentiment score of 4.3/5 vs category avg 3.8.'},
+      {icon:'🏪',bg:'#0d1e28',text:'<strong>GT gap risk</strong>: Only 8% offline presence. Competitors are defending GT share — WOW is exposed if D2C growth slows.'}
+    ],
+    recos:[
+      {label:'Priority 1 — Retention',title:'AI-powered replenishment prediction engine',desc:'WOW\'s 24-day repeat cycle creates a predictable trigger. AI can personalise replenishment nudges at day 18–20 via WhatsApp and email, estimated to reduce churn by 31% and increase LTV by ₹340 per customer.',impact:'LTV uplift: +₹340 per active customer'},
+      {label:'Priority 2 — Expansion',title:'Tier-2 GT push with modern trade bridge',desc:'WOW\'s 8% offline share leaves significant volume on the table. Partnering with DMart and regional chains (Spencer\'s, Reliance Smart) in Jaipur, Surat, Bhopal can add ₹180 Cr in annual revenue.',impact:'Revenue opportunity: ₹180 Cr in 18 months'},
+      {label:'Priority 3 — Content',title:'Shift from influencer-first to community-first content model',desc:'AI sentiment analysis shows "user transformation stories" generate 4.2× more saves and shares than paid influencer content. Curating a UGC loyalty programme would reduce content spend while increasing authenticity signals.',impact:'Content cost reduction: 38% with higher engagement'},
+      {label:'Priority 4 — Product',title:'Launch a personalised skin-type subscription kit',desc:'Subscription commerce in personal care is underpenetrated in India. A quiz-to-kit model (as tested by US brands like Curology) would lock in WOW\'s Millennial base and defend against Nykaa-private-label competition.',impact:'Projected subscription ARR: ₹90 Cr by Year 2'}
+    ]
+  },
+  ponds: {
+    name:"Pond's (HUL)", cat:'Mass Skincare · India', dot:'#d4a843',
+    kpi:{share:'23.1%', shareD:'↓ 0.4% YoY', loyalty:'64', loyaltyD:'↓ 2 pts', repeat:'45 days', repeatD:'→ Flat', digital:'5.8 / 10', digitalD:'↓ 1.1 vs D2C avg'},
+    channels:[{l:'General Trade',v:55},{l:'Modern Trade',v:28},{l:'E-commerce',v:12},{l:'Direct',v:5}],
+    ages:[{l:'18–24',v:16,c:'#d4a843'},{l:'25–34',v:28,c:'#a87c2a'},{l:'35–44',v:30,c:'#7a5a1a'},{l:'45+',v:26,c:'#4a3810'}],
+    drivers:[{l:'Brand heritage',v:72},{l:'Broad availability',v:70},{l:'Affordability',v:68},{l:'Recommendation',v:44},{l:'Digital appeal',v:22}],
+    insights:[
+      {icon:'📉',bg:'#2a1409',text:'<strong>Youth erosion risk</strong>: 18–24 segment shrinking. AI signals Gen-Z considers Pond\'s a "parent\'s brand." Urgency: high.'},
+      {icon:'🏪',bg:'#0d2a1a',text:'<strong>Distribution fortress</strong>: Presence in 6.8M+ outlets. This is the most durable competitive moat in the category.'},
+      {icon:'💛',bg:'#2a2108',text:'<strong>Heritage is double-edged</strong>: 64% loyalty index is driven by 35+ consumers. Without youth penetration, share will decline 2–3% over 5 years.'}
+    ],
+    recos:[
+      {label:'Priority 1 — Youth',title:'Create a Pond\'s "Skin Lab" Gen-Z digital sub-brand',desc:'A digitally-native, derma-science-forward sub-line priced at ₹199–₹349 would let Pond\'s compete in the Minimalist/The Ordinary space without diluting the core brand. AI modelling suggests 23% of current WOW consumers would trial a "Pond\'s Derma" brand.',impact:'New segment: ₹400 Cr TAM in 3 years'},
+      {label:'Priority 2 — Digital',title:'Programmatic AI targeting for lapsed consumers aged 25–34',desc:'AI churn modelling identifies a 25–34 female cohort that used Pond\'s in college but switched post-25. Retargeting this segment with "your skin has changed" messaging converts at 2.8× vs cold acquisition.',impact:'Reactivation ROI: 2.8× vs cold acquisition'},
+      {label:'Priority 3 — Innovation',title:'Develop AI-personalised moisturiser variants by climate zone',desc:'India\'s climate diversity (humid coast vs dry north) means one formula cannot optimise for all. AI-assisted formulation personalisation, with "North India Winter" and "Coastal Humidity" variants, increases relevance and trial.',impact:'Trial uplift: +14% in targeted zones'},
+      {label:'Priority 4 — Distribution',title:'Digitise the GT supply chain for demand-responsive replenishment',desc:'Pond\'s 55% GT dependency is a strength being managed manually. AI-enabled distributor demand sensing (as HUL has piloted with Shikhar app) could reduce stockouts by 23% and improve GT shelf availability.',impact:'Stockout reduction: 23% improvement'}
+    ]
+  },
+  mcaffeine: {
+    name:'mCaffeine', cat:'Premium D2C · India', dot:'#457b9d',
+    kpi:{share:'2.8%', shareD:'↑ 0.9% YoY', loyalty:'61', loyaltyD:'↑ 8 pts', repeat:'21 days', repeatD:'↓ 11 days faster', digital:'9.4 / 10', digitalD:'↑ 1.7 vs trad. avg'},
+    channels:[{l:'Own D2C',v:38},{l:'Amazon',v:35},{l:'Modern Trade',v:18},{l:'Nykaa',v:9}],
+    ages:[{l:'18–24',v:44,c:'#457b9d'},{l:'25–34',v:38,c:'#2d5f7a'},{l:'35–44',v:12,c:'#1a3d52'},{l:'45+',v:6,c:'#0d2233'}],
+    drivers:[{l:'Ingredient story (caffeine)',v:80},{l:'Premium packaging',v:76},{l:'Social media presence',v:72},{l:'D2C experience',v:64},{l:'Gifting appeal',v:58}],
+    insights:[
+      {icon:'☕',bg:'#0d1e28',text:'<strong>Category creator advantage</strong>: mCaffeine invented "coffee skincare" as a category in India. Brand recall is near 100% in its core 18–30 female segment.'},
+      {icon:'📦',bg:'#2a2108',text:'<strong>Gifting is an underused growth lever</strong>: 28% of orders are gifts. AI analysis shows gifting intent spikes 4× in Oct–Feb. Zero dedicated gifting infrastructure exists.'},
+      {icon:'📉',bg:'#2a1409',text:'<strong>Scale risk</strong>: At 2.8% share, mCaffeine is still a niche play. GT expansion is the growth ceiling — without it, TAM is capped.'}
+    ],
+    recos:[
+      {label:'Priority 1 — Gifting',title:'Build a dedicated AI-curated gifting engine',desc:'mCaffeine\'s 28% gift purchase rate is the highest in the D2C personal care category. An AI gifting engine ("build a kit for her skin type + occasion") would increase AOV by ₹180 and reduce return rates by personalising the recommendation.',impact:'AOV uplift: +₹180 per gifting order'},
+      {label:'Priority 2 — Retention',title:'Launch a "Caffeine Club" subscription with AI skin tracking',desc:'A monthly subscription with AI-generated skin progress tracking (photo + survey) creates stickiness no competitor offers. Projected 18-month LTV on subscribers: ₹4,200 vs ₹1,800 for non-subscribers.',impact:'Subscriber LTV: 2.3× vs transactional buyers'},
+      {label:'Priority 3 — Expansion',title:'Modern trade push via Nykaa On-Trend and Reliance Trends',desc:'mCaffeine\'s online-only model limits trial. Modern trade shelf presence in 500 Nykaa and Reliance outlets would expose the brand to the 35–44 working professional segment currently invisible to D2C targeting.',impact:'New segment reach: 14M additional consumers'},
+      {label:'Priority 4 — Product',title:'Extend the caffeine story to Men\'s care',desc:'Men\'s personal care is the fastest-growing sub-category in India at 18% CAGR. No D2C brand has credibly extended caffeine to a male positioning. mCaffeine\'s brand equity is gender-transferable.',impact:'Men\'s market TAM: ₹2,800 Cr by 2027'}
+    ]
+  }
+};
+
+let activeBrand = 'himalaya';
+let activeScenario = 'base';
+let activeSegment = null;
+
+// ─── NAV ─────────────────────────────────────────────────
+function nav(page, btn) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  if(btn) btn.classList.add('active');
+  if(page==='forecast') renderForecast();
+  if(page==='competitive') renderCompetitive();
+  if(page==='promo') renderPromo();
+  if(page==='segments') renderSegments();
+  if(page==='recommendations') renderRecos();
+}
+
+// ─── BRAND SWITCH ────────────────────────────────────────
+function setBrand(key, btn) {
+  activeBrand = key;
+  document.querySelectorAll('.brand-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const d = BRANDS[key];
+  document.getElementById('tb-brand').textContent = d.name;
+  document.getElementById('tb-cat').textContent = d.cat;
+  document.getElementById('tb-dot').style.background = d.dot;
+  document.getElementById('ov-title').textContent = d.name + ' — Market Overview';
+  document.getElementById('ch-label').textContent = d.name + ' FY26';
+  document.getElementById('reco-brand-label').textContent = d.name;
+  renderOverview();
+  // refresh active page
+  const activePage = document.querySelector('.page.active');
+  if(activePage){
+    const id = activePage.id.replace('page-','');
+    if(id==='segments') renderSegments();
+    if(id==='forecast') renderForecast();
+    if(id==='competitive') renderCompetitive();
+    if(id==='recommendations') renderRecos();
+  }
+}
+
+// ─── OVERVIEW ────────────────────────────────────────────
+function renderOverview() {
+  const d = BRANDS[activeBrand];
+  const k = d.kpi;
+  document.getElementById('kpi-share').textContent = k.share;
+  document.getElementById('kpi-share-d').textContent = k.shareD;
+  document.getElementById('kpi-loyalty').textContent = k.loyalty;
+  document.getElementById('kpi-loyalty-d').textContent = k.loyaltyD;
+  document.getElementById('kpi-repeat').textContent = k.repeat;
+  document.getElementById('kpi-repeat-d').textContent = k.repeatD;
+  document.getElementById('kpi-digital').textContent = k.digital;
+  document.getElementById('kpi-digital-d').textContent = k.digitalD;
+
+  // fix delta classes
+  ['kpi-share-d','kpi-loyalty-d','kpi-repeat-d','kpi-digital-d'].forEach(id=>{
+    const el = document.getElementById(id);
+    const t = el.textContent;
+    el.className = 'kpi-delta ' + (t.startsWith('↑') || t.includes('faster') ? 'up' : 'down');
+  });
+
+  // channels
+  document.getElementById('channel-bars').innerHTML = d.channels.map(c=>barRow(c.l, c.v, '#74c69d')).join('');
+  // donut
+  renderDonut(d.ages);
+  // drivers
+  document.getElementById('driver-bars').innerHTML = d.drivers.map(dr=>barRow(dr.l, dr.v, d.dot)).join('');
+  // insights
+  document.getElementById('overview-insights').innerHTML = d.insights.map(i=>`<div class="insight-card"><div class="insight-icon" style="background:${i.bg};font-size:16px">${i.icon}</div><div class="insight-text">${i.text}</div></div>`).join('');
+  document.getElementById('insight-label').textContent = d.insights.length + ' signals detected';
+}
+
+function barRow(label, val, color) {
+  return `<div class="bar-row">
+    <div class="bar-label">${label}</div>
+    <div class="bar-track"><div class="bar-fill" style="width:${val}%;background:${color}"></div></div>
+    <div class="bar-pct">${val}%</div>
+  </div>`;
+}
+
+function renderDonut(ages) {
+  const r = 38, cx = 55, cy = 55, stroke = 16;
+  const circumference = 2 * Math.PI * r;
+  let cumulative = 0;
+  let paths = '';
+  ages.forEach(a => {
+    const pct = a.v / 100;
+    const dashLen = circumference * pct;
+    const offset = circumference * (1 - cumulative);
+    paths += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${a.c}" stroke-width="${stroke}" stroke-dasharray="${dashLen} ${circumference - dashLen}" stroke-dashoffset="${offset}" style="transform:rotate(-90deg);transform-origin:${cx}px ${cy}px"/>`;
+    cumulative += pct;
+  });
+  document.getElementById('donut-svg').innerHTML = paths + `<text x="${cx}" y="${cy+4}" text-anchor="middle" fill="#f0ece4" font-size="14" font-family="Syne,sans-serif" font-weight="700">Age</text>`;
+  document.getElementById('donut-legend').innerHTML = ages.map(a=>`<div class="legend-item"><div class="legend-dot" style="background:${a.c}"></div><div class="legend-label">${a.l}</div><div class="legend-pct">${a.v}%</div></div>`).join('');
+}
+
+// ─── SEGMENTS ────────────────────────────────────────────
+const SEGMENTS = [
+  {id:'naturalist',name:'Informed Naturalists',size:28,color:'#74c69d',bg:'#0d2a1a',tags:['Ingredient-aware','Research-heavy','Eco-conscious'],profile:{age:'22–32, Urban Female',income:'₹4–10L PA',behavior:'Reads ingredient labels. Follows dermatologists on Instagram. Mistrustful of chemical-heavy brands.',channel:'Instagram, Dermatologist recommendation, D2C brand sites',spend:'₹300–600/month on skincare',aiAction:'Target with ingredient education content + transparent formulation storytelling. Build dermatologist-approved badge programme.'}},
+  {id:'aspirational',name:'Aspirational Upgraders',size:22,color:'#d4a843',bg:'#2a2108',tags:['Brand-driven','Premium-seeking','Gift-aware'],profile:{age:'25–35, Tier-1 & 2 Urban',income:'₹8–20L PA',behavior:'Uses mid-tier brands but aspirations are premium. Regularly upgrades SKUs. Gifting is primary discovery trigger.',channel:'Mall modern trade, Instagram luxury ads, Nykaa',spend:'₹500–1200/month',aiAction:'Personalise "your next upgrade" product journeys. Target around salary credit dates and festive gifting windows.'}},
+  {id:'value',name:'Value-Loyal Regulars',size:32,color:'#e76f51',bg:'#2a1409',tags:['Price-sensitive','Habitual','GT shoppers'],profile:{age:'30–50, Tier-2/3, All genders',income:'₹2–6L PA',behavior:'Buys the same SKU repeatedly. Price shock causes switching. Brand trust built over years — not easily disrupted.',channel:'Kirana / General Trade, TV advertising',spend:'₹100–250/month',aiAction:'Defend with loyalty pricing and retailer-push programmes. Any price hike needs anchoring communication 6 weeks in advance.'}},
+  {id:'explorer',name:'Digital-First Explorers',size:18,color:'#457b9d',bg:'#0d1e28',tags:['TikTok/Reels-influenced','Trial-happy','Review-driven'],profile:{age:'18–24, College + Early Career',income:'₹0–4L PA',behavior:'Buys based on viral Reels content and peer reviews. High trial frequency, low loyalty. Influenced by before/after content.',channel:'Instagram Reels, YouTube, Quick Commerce',spend:'₹150–400/month',aiAction:'Win trial with sampling and micro-influencer seeding. Convert to loyalty with personalised skin quiz and email drip post-trial.'}}
+];
+
+function renderSegments() {
+  document.getElementById('seg-grid').innerHTML = SEGMENTS.map(s=>`
+    <div class="seg-card ${activeSegment===s.id?'active':''}" onclick="selectSegment('${s.id}')">
+      <div class="seg-name">${s.name}</div>
+      <div class="seg-size">${s.size}% of consumers</div>
+      <div class="seg-bar"><div class="seg-bar-fill" style="width:${s.size*2.5}%;background:${s.color}"></div></div>
+      <div class="seg-tags">${s.tags.map(t=>`<span class="seg-tag">${t}</span>`).join('')}</div>
+    </div>`).join('');
+  document.getElementById('seg-size-bars').innerHTML = SEGMENTS.map(s=>barRow(s.name.split(' ')[0]+' '+s.name.split(' ')[1], s.size, s.color)).join('');
+  document.getElementById('seg-compare-body').innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="font-size:12px;color:var(--text3);margin-bottom:4px">Traditional segmentation lumps "18–35 urban female" as one group. AI identifies 4 distinct behavioural clusters with different purchase drivers and channel preferences.</div>
+      ${[{trad:'Urban Female 18–35',ai:'Informed Naturalist + Digital Explorer (2 distinct groups)'},{trad:'Male consumers (ignored)',ai:'Value-Loyal Regular + Digital Explorer male sub-clusters'},{trad:'Age-based: 35+',ai:'Aspirational Upgrader (income-led, not age-led)'}].map(r=>`<div style="background:var(--ink3);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;font-size:11px;color:var(--text2)"><span style="color:var(--text3)">Traditional:</span> ${r.trad} <span style="color:var(--sage3);margin:0 4px">→</span> <span style="color:var(--text)">AI:</span> ${r.ai}</div>`).join('')}
+    </div>`;
+}
+
+function selectSegment(id) {
+  activeSegment = id;
+  const s = SEGMENTS.find(x=>x.id===id);
+  document.querySelectorAll('.seg-card').forEach(c=>c.classList.remove('active'));
+  document.querySelectorAll('.seg-card').forEach(c=>{if(c.onclick.toString().includes(id))c.classList.add('active')});
+  document.getElementById('seg-detail-label').textContent = s.name;
+  document.getElementById('seg-detail-body').innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="background:${s.bg};border:1px solid ${s.color}33;border-radius:var(--radius);padding:10px 12px">
+        <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px">Profile</div>
+        <div style="font-size:12px;color:var(--text2)">${s.profile.age} · ${s.profile.income}</div>
+      </div>
+      ${[{l:'Behaviour',v:s.profile.behavior},{l:'Channel',v:s.profile.channel},{l:'Monthly Spend',v:s.profile.spend}].map(f=>`<div class="d-field" style="margin-bottom:0"><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:3px">${f.l}</div><div style="font-size:12px;color:var(--text2);line-height:1.5">${f.v}</div></div>`).join('')}
+      <div style="background:var(--sage-dim);border:1px solid var(--sage2);border-radius:var(--radius);padding:10px 12px">
+        <div style="font-size:10px;color:var(--sage3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px">AI Strategy</div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.55">${s.profile.aiAction}</div>
+      </div>
+    </div>`;
+  renderSegments();
+  document.querySelectorAll('.seg-card').forEach(c=>{
+    if(c.getAttribute('onclick')&&c.getAttribute('onclick').includes("'"+id+"'")) c.classList.add('active');
+  });
+}
+
+// ─── FORECAST ────────────────────────────────────────────
+const MONTHS_SHORT = ['Q1','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar'];
+const MONTHS_FULL = ['Q1 FY26','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar'];
+const SCENARIOS = {
+  base: {label:'Base Scenario', color:'#74c69d', vals:[100,102,105,103,108,112,116,124,130,128,133,138]},
+  bull: {label:'Bull Scenario', color:'#d4a843', vals:[100,105,110,108,118,126,132,144,152,149,158,168]},
+  bear: {label:'Bear Scenario', color:'#e76f51', vals:[100,99,101,100,103,105,107,110,112,111,113,115]}
+};
+
+function setScenario(s) { activeScenario = s; renderForecast(); }
+
+function renderForecast() {
+  const sc = SCENARIOS[activeScenario];
+  document.getElementById('scenario-label').textContent = sc.label;
+  document.getElementById('forecast-table-label').textContent = sc.label + ' · Units indexed to 100';
+
+  // SVG line chart
+  const vals = sc.vals;
+  const W=800, H=200, pad=30;
+  const minV = Math.min(...vals)-5, maxV = Math.max(...vals)+5;
+  const xStep = (W-pad*2)/(vals.length-1);
+  const yScale = v => H - pad - ((v-minV)/(maxV-minV))*(H-pad*2);
+  const points = vals.map((v,i)=>`${pad+i*xStep},${yScale(v)}`).join(' ');
+  const areaPoints = `${pad},${H-pad} ${points} ${pad+(vals.length-1)*xStep},${H-pad}`;
+  const svg = `
+    <defs><linearGradient id="lg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${sc.color}" stop-opacity="0.3"/><stop offset="100%" stop-color="${sc.color}" stop-opacity="0.02"/></linearGradient></defs>
+    ${[0,25,50,75,100].map(pct=>{const y=yScale(minV+(maxV-minV)*pct/100);return `<line x1="${pad}" y1="${y}" x2="${W-pad}" y2="${y}" stroke="#2a2e36" stroke-width="0.5"/><text x="${pad-4}" y="${y+4}" fill="#5a6170" font-size="9" text-anchor="end">${Math.round(minV+(maxV-minV)*pct/100)}</text>`}).join('')}
+    ${MONTHS_SHORT.map((m,i)=>`<text x="${pad+i*xStep}" y="${H-8}" fill="#5a6170" font-size="9" text-anchor="middle">${m}</text>`).join('')}
+    <polygon points="${areaPoints}" fill="url(#lg)"/>
+    <polyline points="${points}" fill="none" stroke="${sc.color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    ${vals.map((v,i)=>`<circle cx="${pad+i*xStep}" cy="${yScale(v)}" r="3.5" fill="${sc.color}" stroke="#0d0e10" stroke-width="2"/>`).join('')}
+  `;
+  document.getElementById('forecast-svg').innerHTML = svg;
+
+  // table
+  document.getElementById('forecast-table').innerHTML = `<thead><tr><th>Month</th><th>Index</th><th>vs Prior Month</th><th>vs Base</th><th>Signal</th></tr></thead><tbody>
+    ${vals.map((v,i)=>{
+      const delta = i>0 ? ((v-vals[i-1])/vals[i-1]*100).toFixed(1) : '—';
+      const vsBase = (v - SCENARIOS.base.vals[i]).toFixed(1);
+      const signal = v > 120 ? 'Peak demand' : v > 110 ? 'Growth phase' : v < 102 ? 'Flat/risk' : 'Steady';
+      return `<tr><td>${MONTHS_FULL[i]}</td><td class="mono">${v}</td><td class="${i>0?(parseFloat(delta)>=0?'pos':'neg'):''} mono">${i>0?(parseFloat(delta)>=0?'+':'')+delta+'%':'—'}</td><td class="${parseFloat(vsBase)>=0?'pos':'neg'} mono">${parseFloat(vsBase)>=0?'+':''}${vsBase}</td><td style="font-size:11px;color:var(--text3)">${signal}</td></tr>`;
+    }).join('')}
+  </tbody>`;
+}
+
+// ─── COMPETITIVE ─────────────────────────────────────────
+const BRANDS_MAP = [
+  {name:'Himalaya',x:32,y:62,r:46,c:'#74c69d',bg:'#0d2a1a'},
+  {name:"Pond's",x:25,y:45,r:50,c:'#d4a843',bg:'#2a2108'},
+  {name:'WOW',x:62,y:72,r:32,c:'#e76f51',bg:'#2a1409'},
+  {name:'Minimalist',x:72,y:80,r:22,c:'#9b8fd4',bg:'#1a1630'},
+  {name:'mCaffeine',x:68,y:68,r:20,c:'#457b9d',bg:'#0d1e28'},
+  {name:'Nykaa PL',x:58,y:60,r:18,c:'#e0b0d0',bg:'#2a1525'},
+  {name:'Lakme',x:42,y:48,r:30,c:'#d4879a',bg:'#2a1218'},
+];
+
+function renderCompetitive() {
+  const map = document.getElementById('comp-map');
+  // Remove old bubbles
+  document.querySelectorAll('.comp-bubble').forEach(e=>e.remove());
+  BRANDS_MAP.forEach(b=>{
+    const div = document.createElement('div');
+    div.className = 'comp-bubble';
+    div.style.cssText = `left:${b.x}%;top:${100-b.y}%;width:${b.r}px;height:${b.r}px;background:${b.bg};border-color:${b.c}44`;
+    div.innerHTML = `<div class="comp-bubble-label" style="color:${b.c};font-size:${b.r<24?8:9}px">${b.name}</div>`;
+    div.title = b.name;
+    map.appendChild(div);
+  });
+
+  // SOV bars
+  const sovData = [{l:'Himalaya',v:24},{l:"Pond's",v:21},{l:'WOW',v:18},{l:'Lakme',v:14},{l:'mCaffeine',v:12},{l:'Minimalist',v:11}];
+  document.getElementById('sov-bars').innerHTML = sovData.map(s=>barRow(s.l, s.v, '#74c69d')).join('');
+
+  // Heatmap
+  const brands2 = ['Himalaya',"Pond's",'WOW','Minimalist','mCaffeine'];
+  const attrs = ['Natural','Affordable','Premium','Digital','Trust','Innovation'];
+  const scores = [
+    [9,7,8,5,9,6],[8,9,5,4,8,4],[7,6,9,9,6,8],[6,5,7,10,5,9],[7,6,8,9,7,10]
+  ];
+  function heatColor(v) {
+    if(v>=9) return {bg:'#0d2a1a',c:'#74c69d'};
+    if(v>=7) return {bg:'#162a1f',c:'#4caf7d'};
+    if(v>=5) return {bg:'#2a2e36',c:'#9ba3b0'};
+    return {bg:'#2a1515',c:'#e05c5c'};
+  }
+  let htm = `<div class="heat-grid">
+    <div class="heat-col-label"></div>${brands2.map(b=>`<div class="heat-col-label" style="font-size:10px;color:var(--text2);font-weight:500">${b}</div>`).join('')}
+    ${attrs.map((a,ai)=>`<div class="heat-row-label">${a}</div>${brands2.map((_,bi)=>{const s=scores[bi][ai];const hc=heatColor(s);return `<div class="heat-cell" style="background:${hc.bg};color:${hc.c}">${s}</div>`}).join('')}`).join('')}
+  </div>`;
+  document.getElementById('heatmap-body').innerHTML = htm;
+}
+
+// ─── PROMO ───────────────────────────────────────────────
+const PROMO_DATA = [
+  {m:'Apr',intensity:60,tags:['Summer push','Face wash']},
+  {m:'May',intensity:75,tags:['Summer peak','Sunscreen']},
+  {m:'Jun',intensity:65,tags:['Monsoon',  'Oil control']},
+  {m:'Jul',intensity:40,tags:['Steady','Replenishment']},
+  {m:'Aug',intensity:55,tags:['Pre-festive','Awareness']},
+  {m:'Sep',intensity:80,tags:['Festive prep','Gifting launch']},
+  {m:'Oct',intensity:95,tags:['Festive peak','Max spend']},
+  {m:'Nov',intensity:85,tags:['Wedding season','Premium']},
+  {m:'Dec',intensity:70,tags:['Year-end','Gift sets']},
+  {m:'Jan',intensity:65,tags:['New year skin','Serums']},
+  {m:'Feb',intensity:50,tags:['Valentine\'s','Gifting']},
+  {m:'Mar',intensity:45,tags:['FY close','Clearance']}
+];
+function intensityColor(v) {
+  if(v>=85) return '#e76f51';
+  if(v>=65) return '#d4a843';
+  return '#74c69d';
+}
+function renderPromo() {
+  document.getElementById('promo-cal').innerHTML = PROMO_DATA.map(p=>`
+    <div class="promo-month">
+      <div class="promo-month-name">${p.m}</div>
+      <div class="promo-intensity" style="width:${p.intensity}%;background:${intensityColor(p.intensity)}"></div>
+      <div style="font-size:10px;color:var(--text3);text-align:center;font-family:'DM Mono',monospace;margin-bottom:4px">${p.intensity}</div>
+      <div class="promo-tags">${p.tags.map(t=>`<span class="promo-tag">${t}</span>`).join('')}</div>
+    </div>`).join('');
+}
+
+// ─── RECOMMENDATIONS ─────────────────────────────────────
+function renderRecos() {
+  const d = BRANDS[activeBrand];
+  const colors = ['sage','gold','coral','sky'];
+  const colorMap = {sage:'var(--sage3)',gold:'var(--gold)',coral:'var(--coral)',sky:'var(--sky)'};
+  const bgMap = {sage:'var(--sage-dim)',gold:'var(--gold-dim)',coral:'var(--coral-dim)',sky:'var(--sky-dim)'};
+  const borderMap = {sage:'var(--sage2)',gold:'var(--gold)',coral:'var(--coral)',sky:'var(--sky)'};
+  document.getElementById('reco-list').innerHTML = d.recos.map((r,i)=>{
+    const col = colors[i%4];
+    return `<div class="reco-card" style="background:linear-gradient(135deg,${bgMap[col]},var(--ink3));border-color:${borderMap[col]}33">
+      <div class="reco-label" style="color:${colorMap[col]}">${r.label}</div>
+      <div class="reco-title">${r.title}</div>
+      <div class="reco-desc">${r.desc}</div>
+      <div class="reco-impact" style="color:${colorMap[col]};background:${bgMap[col]};border-color:${borderMap[col]}44">📈 ${r.impact}</div>
+    </div>`;
+  }).join('');
+}
+
+// ─── INIT ────────────────────────────────────────────────
+renderOverview();
+renderSegments();
+renderPromo();
+renderCompetitive();
+renderForecast();
+renderRecos();
+</script>
+</body>
+</html>
